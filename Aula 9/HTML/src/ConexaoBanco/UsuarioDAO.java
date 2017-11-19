@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
@@ -373,6 +374,91 @@ public void atualizar2(Usuario usuario) {
 		e.printStackTrace();
 	}
 }
+
+
+public ArrayList<Usuario> listarUsuario() throws IOException {
+	Usuario usuario;
+	ArrayList<Usuario> lista = new ArrayList<>();
+	// pega a conexão em um try normal para que ela não seja fechada
+	try {
+		Connection conn = ConnectionFactory.getConnection();
+		String sqlSelect = "SELECT SELECT usuarioNome,usuarioRG,usuarioCPF,usuarioSexo,usuarioConta,usuarioSenha,usuarioHorarioEntrada,usuarioHorarioSaida from usuario";
+		// usando o try with resources do Java 7, que fecha o que abriu
+		try (PreparedStatement stm = conn.prepareStatement(sqlSelect);) {
+			try (ResultSet rs = stm.executeQuery();) {
+				while (rs.next()) {
+					usuario = new Usuario();
+					usuario.setNome(rs.getString("nome"));
+					usuario.setRg(rs.getString("rg"));
+					usuario.setCpf(rs.getString("cpf"));
+					usuario.setSexo(rs.getString("sexo"));
+					usuario.setConta(rs.getString("conta"));
+					usuario.setSenha(rs.getString("senha"));
+					usuario.setHorarioEntrada(rs.getString("horarioEntrada"));
+					usuario.setHorarioSaida(rs.getString("horarioSaida"));
+					usuario.setTipo(rs.getString("tipo"));
+					lista.add(usuario);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new IOException();
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+			throw new IOException();
+		}
+	} catch (SQLException e2) {
+		e2.printStackTrace();
+		throw new IOException();
+	}
+	return lista;
+}
+
+
+
+public ArrayList<Usuario> listarUsuario(String chave) throws IOException {
+	Usuario usuario;
+	ArrayList<Usuario> lista = new ArrayList<>();
+	String sqlSelect = "SELECT usuarioNome,usuarioRG,usuarioCPF,usuarioSexo,usuarioConta,usuarioSenha,usuarioHorarioEntrada,usuarioHorarioSaida from usuario where upper(nome) like ?";
+	// pega a conexão em um try normal para que ela não seja fechada
+	try {
+		Connection conn = ConnectionFactory.getConnection();
+		// usando o try with resources do Java 7, que fecha o que abriu
+		try (PreparedStatement stm = conn.prepareStatement(sqlSelect);) {
+			stm.setString(1, "%" + chave.toUpperCase() + "%");
+			try (ResultSet rs = stm.executeQuery();) {
+				while (rs.next()) {
+					usuario = new Usuario();
+					usuario.setNome(rs.getString("nome"));
+					usuario.setRg(rs.getString("rg"));
+					usuario.setCpf(rs.getString("cpf"));
+					usuario.setSexo(rs.getString("sexo"));
+					usuario.setConta(rs.getString("conta"));
+					usuario.setSenha(rs.getString("senha"));
+					usuario.setHorarioEntrada(rs.getString("horarioEntrada"));
+					usuario.setHorarioSaida(rs.getString("horarioSaida"));
+					usuario.setTipo(rs.getString("tipo"));
+					lista.add(usuario);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new IOException();
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+			throw new IOException();
+		}
+	} catch (SQLException e2) {
+		e2.printStackTrace();
+		throw new IOException();
+	}
+	return lista;
+}
+
+
+
+
+
 
 
 
